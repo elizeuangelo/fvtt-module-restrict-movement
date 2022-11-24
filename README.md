@@ -4,7 +4,7 @@ Enable/disable movement based on turns, even outside combat.
 
 ## Installation
 
-In the setup screen, use the manifest URL https://raw.githubusercontent.com/elizeuangelo/fvtt-module-npc-generator-dnd5e/master/module.json to install the module.
+In the setup screen, use the manifest URL https://raw.githubusercontent.com/elizeuangelo/fvtt-module-restrict-movement/master/module.json to install the module.
 
 ## How to Use
 
