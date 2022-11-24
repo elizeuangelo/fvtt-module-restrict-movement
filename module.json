@@ -1,0 +1,37 @@
+{
+	"id": "restrict-movement",
+	"name": "restrict-movement",
+	"title": "Restrict Movement",
+	"description": "Enable/disable movement based on turns, even outside combat.",
+	"version": "0.8",
+	"author": ["elizeuangelo"],
+	"esmodules": ["./main.js"],
+	"compatibility": {
+		"minimum": 10,
+		"verified": 10.3
+	},
+	"relationships": {
+		"systems": [
+			{
+				"id": "dnd5e",
+				"type": "system",
+				"manifest": "https://raw.githubusercontent.com/foundryvtt/dnd5e/master/system.json",
+				"compatibility": {
+					"verified": "2.0.3"
+				}
+			}
+		]
+	},
+	"packs": [
+		{
+			"name": "macros",
+			"label": "Macros",
+			"path": "./packs/macros.db",
+			"module": "restrict-movement",
+			"entity": "Macro"
+		}
+	],
+	"system": ["dnd5e"],
+	"minimumCoreVersion": 10,
+	"compatibleCoreVersion": 10.3
+}
