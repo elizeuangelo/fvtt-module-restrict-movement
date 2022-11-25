@@ -138,7 +138,7 @@ export function turnNotifications() {
 	if (current.isOwner || !current.document.hidden) canvas.ping(current.center);
 	if (game.user.isGM) return;
 	if (current.isOwner) ui.notifications.notify("It's your turn!");
-	else if (nextToken().isOwner) ui.notifications.notify('Your turn is next, prepare!');
+	else if (nextToken().isOwner) ui.notifications.notify('Your turn is next!');
 }
 
 export function turns() {
