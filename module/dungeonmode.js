@@ -133,6 +133,7 @@ export function updateMarks() {
 }
 
 export function turnNotifications() {
+	if (!game.settings.get(NAME, 'movement-restricted')) return;
 	const current = currentToken();
 	if (current.isOwner || !current.document.hidden) canvas.ping(current.center);
 	if (game.user.isGM) return;
