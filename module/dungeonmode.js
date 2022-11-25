@@ -1,4 +1,5 @@
 import { NAME, turnOrder, getJournal } from './settings.js';
+import { removeMarks, applyMarks } from './turnmarks.js';
 
 export function getSceneControlButtons(controls) {
 	if (!game.user.isGM) return;
@@ -46,11 +47,20 @@ function getAllRestrictedTokens() {
 }
 
 function currentToken(restrictedTokens = getAllRestrictedTokens()) {
+	return checkTokenOrder(0, restrictedTokens);
+}
+
+function nextToken(restrictedTokens = getAllRestrictedTokens()) {
+	return checkTokenOrder(1, restrictedTokens);
+}
+
+function checkTokenOrder(order = 0, restrictedTokens = getAllRestrictedTokens()) {
 	if (!game.combat) {
-		const turn = turnOrder() % restrictedTokens.length;
+		const turn = (turnOrder() + order) % restrictedTokens.length;
 		return restrictedTokens[turn];
 	}
-	return game.combat.combatant.token;
+	const turn = (game.combat.turn + order) % game.combat.turns.length;
+	return game.combat.turns[turn].token.object;
 }
 
 function allowMovement(token) {
@@ -73,7 +83,11 @@ export function preUpdateToken(document, update) {
 		if (!allowMovement(document)) {
 			delete update.x;
 			delete update.y;
-			ui.notifications.warn("Token can't be moved out of turn order");
+			const current = currentToken();
+			const owner = current.isOwner;
+			const hideName = !owner && !current.hidden && ![30, 50].includes(current.displayName);
+			if (hideName) ui.notifications.warn(`It is currently someone else's turn...`);
+			else ui.notifications.warn(`It is currently ${current.name}'s turn...`);
 		}
 	}
 }
@@ -93,4 +107,19 @@ function passTurn() {
 
 export function createApi() {
 	game.modules.get(NAME).api = { passTurn };
+}
+
+export function updateMarks() {
+	if (game.settings.get(NAME, 'movement-restricted')) {
+		const restrictedTokens = getAllRestrictedTokens();
+		const current = currentToken(restrictedTokens);
+		const next = nextToken(restrictedTokens);
+		applyMarks(current, next);
+	} else removeMarks();
+}
+
+export function turnNotifications() {
+	if (game.user.isGM) return;
+	if (currentToken().isOwner) ui.notifications.notify("It's your turn");
+	else if (nextToken().isOwner) ui.notifications.notify('Your turn is next');
 }

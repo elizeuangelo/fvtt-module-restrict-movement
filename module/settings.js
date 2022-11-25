@@ -1,3 +1,5 @@
+import { updateMarks, turnNotifications } from './dungeonmode.js';
+
 export const NAME = 'restrict-movement';
 
 export function registerSettings() {
@@ -7,6 +9,10 @@ export function registerSettings() {
 		config: false,
 		type: Boolean,
 		default: false,
+		onChange: () => {
+			updateMarks();
+			turnNotifications();
+		},
 	});
 	game.settings.register(NAME, 'counter', {
 		name: 'dungeon modes counter',
