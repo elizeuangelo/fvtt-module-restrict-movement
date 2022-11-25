@@ -41,6 +41,14 @@ export function registerSettings() {
 		hint: 'Enables/disables the button, in case you want to use the macro instead.',
 		requiresReload: true,
 	});
+	game.settings.register(NAME, 'token-highlight', {
+		name: 'Token Highlight',
+		scope: 'world',
+		config: true,
+		type: Boolean,
+		default: true,
+		hint: 'Enables/disables token highlight when a turn starts.',
+	});
 }
 
 const JOURNAL_NAME = 'dungeon-mode-data';

@@ -135,7 +135,7 @@ export function updateMarks() {
 export function turnNotifications() {
 	if (!game.settings.get(NAME, 'movement-restricted')) return;
 	const current = currentToken();
-	if (current.isOwner || !current.document.hidden) canvas.ping(current.center);
+	if (game.settings.get(NAME, 'token-highlight') && (current.isOwner || !current.document.hidden)) canvas.ping(current.center);
 	if (game.user.isGM) return;
 	if (current.isOwner) ui.notifications.notify("It's your turn!");
 	else if (nextToken().isOwner) ui.notifications.notify('Your turn is next!');
