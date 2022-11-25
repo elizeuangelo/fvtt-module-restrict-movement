@@ -1,10 +1,14 @@
 {
 	"id": "restrict-movement",
-	"name": "restrict-movement",
 	"title": "Faendal's Restrict Movement",
 	"description": "Enable/disable movement based on turns, even outside combat.",
-	"version": "0.91",
-	"author": ["elizeuangelo"],
+	"version": "0.92",
+	"authors": [
+		{
+			"name": "Elizeu Angelo",
+			"discord": "Magus#9576"
+		}
+	],
 	"esmodules": ["./main.js"],
 	"compatibility": {
 		"minimum": 9,
@@ -16,12 +20,9 @@
 			"label": "Macros",
 			"path": "./packs/macros.db",
 			"module": "restrict-movement",
-			"entity": "Macro"
+			"type": "Macro"
 		}
 	],
-	"system": ["dnd5e"],
-	"minimumCoreVersion": 10,
-	"compatibleCoreVersion": 10.3,
 	"manifest": "https://github.com/elizeuangelo/fvtt-module-restrict-movement/releases/latest/download/module.json",
 	"download": "https://github.com/elizeuangelo/fvtt-module-restrict-movement/releases/latest/download/restrict-movement.zip"
 }
