@@ -2,7 +2,7 @@
 	"id": "restrict-movement",
 	"title": "Faendal's Restrict Movement",
 	"description": "Enable/disable movement based on turns, even outside combat.",
-	"version": "0.92",
+	"version": "0.94",
 	"authors": [
 		{
 			"name": "Elizeu Angelo",

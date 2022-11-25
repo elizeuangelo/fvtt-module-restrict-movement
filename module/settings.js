@@ -12,7 +12,7 @@ export function registerSettings() {
 		onChange: (active) => {
 			updateMarks();
 			turnNotifications();
-			if (active) {
+			if (active && game.user.isGM) {
 				const order = turns();
 				ChatMessage.create({
 					content: `  <div class="card-draw flexrow">
@@ -20,7 +20,7 @@ export function registerSettings() {
                                     <h4 class="card-name">Dungeon Mode: Turn Order</h4>
                                 </div>
                                 <ol>${order.map((t) => `<li>${t.name}</li>`).join('')}</ol>`,
-					whisper: game.users.filter((u) => u.isGM),
+					whisper: [game.user.id],
 				});
 			}
 		},
