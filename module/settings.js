@@ -1,4 +1,4 @@
-import { updateMarks, turnNotifications } from './dungeonmode.js';
+import { updateMarks, turnNotifications, turns } from './dungeonmode.js';
 
 export const NAME = 'restrict-movement';
 
@@ -9,9 +9,20 @@ export function registerSettings() {
 		config: false,
 		type: Boolean,
 		default: false,
-		onChange: () => {
+		onChange: (active) => {
 			updateMarks();
 			turnNotifications();
+			if (active) {
+				const order = turns();
+				ChatMessage.create({
+					content: `  <div class="card-draw flexrow">
+                                    <img class="card-face" src="icons/magic/time/hourglass-tilted-gray.webp" alt="img-name"/>
+                                    <h4 class="card-name">Dungeon Mode: Turn Order</h4>
+                                </div>
+                                <ol>${order.map((t) => `<li>${t.name}</li>`).join('')}</ol>`,
+					whisper: game.users.filter((u) => u.isGM),
+				});
+			}
 		},
 	});
 	game.settings.register(NAME, 'counter', {
@@ -20,6 +31,15 @@ export function registerSettings() {
 		config: false,
 		type: Number,
 		default: 0,
+	});
+	game.settings.register(NAME, 'pass-turn-btn', {
+		name: 'Show Pass Turn Button',
+		scope: 'world',
+		config: true,
+		type: Boolean,
+		default: true,
+		hint: 'Enables/disables the button, in case you want to use the macro instead.',
+		requiresReload: true,
 	});
 }
 

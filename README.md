@@ -1,4 +1,4 @@
-# Foundry VTT - Restrict Movement
+# Foundry VTT - Faendal's Restrict Movement
 
 Enable/disable movement based on turns, even outside combat.
 

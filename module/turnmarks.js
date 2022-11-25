@@ -5,7 +5,7 @@ function createMark(mark, alpha = 1) {
 		fill: 0xffffff,
 		dropShadowColor: 0,
 		dropShadowAlpha: 0,
-		fontWeight: 900,
+		fontWeight: 400,
 		fontFamily: 'Font Awesome 6 Pro',
 		fontSize: '3em/1',
 	};

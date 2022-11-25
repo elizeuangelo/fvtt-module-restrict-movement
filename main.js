@@ -18,6 +18,6 @@ Hooks.once('ready', () => {
 	Hooks.on('updateJournalEntry', (journal, data) => {
 		if (!('restrict-movement' in data.flags)) return;
 		updateMarks();
-		if (!game.combat) turnNotifications();
+		turnNotifications();
 	});
 });

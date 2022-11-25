@@ -2,10 +2,9 @@ import { NAME, turnOrder, getJournal } from './settings.js';
 import { removeMarks, applyMarks } from './turnmarks.js';
 
 export function getSceneControlButtons(controls) {
-	if (!game.user.isGM) return;
-	controls
-		.find((c) => c.name === 'token')
-		.tools.push({
+	const tokens = controls.find((c) => c.name === 'token');
+	if (game.user.isGM)
+		tokens.tools.push({
 			name: 'dungeon-mode',
 			title: 'Dungeon Mode',
 			icon: 'fas fa-dungeon',
@@ -14,10 +13,18 @@ export function getSceneControlButtons(controls) {
 			onClick: (active) => {
 				game.settings.set(NAME, 'movement-restricted', active);
 				if (active) {
-					ui.notifications.notify('Dungeon Mode is now active, players movements are restricted');
+					ui.notifications.notify('Dungeon mode is now ACTIVE: player movement is restricted');
 					game.settings.set(NAME, 'counter', game.settings.get(NAME, 'counter') + 1);
-				} else ui.notifications.notify('Dungeon Mode is now inactive, players can move freely');
+				} else ui.notifications.notify('Dungeon Mode is now INACTIVE: players can move freely');
 			},
+		});
+	if (game.settings.get(NAME, 'pass-turn-btn'))
+		tokens.tools.push({
+			name: 'pass-turn',
+			title: 'Pass Turn',
+			icon: 'fa-solid fa-arrows-spin',
+			button: true,
+			onClick: passTurn,
 		});
 }
 
@@ -83,9 +90,8 @@ export function preUpdateToken(document, update) {
 		if (!allowMovement(document)) {
 			delete update.x;
 			delete update.y;
-			const current = currentToken();
-			const owner = current.isOwner;
-			const hideName = !owner && !current.hidden && ![30, 50].includes(current.displayName);
+			const current = currentToken().document;
+			const hideName = !current.hidden && ![30, 50].includes(current.displayName);
 			if (hideName) ui.notifications.warn(`It is currently someone else's turn...`);
 			else ui.notifications.warn(`It is currently ${current.name}'s turn...`);
 		}
@@ -99,10 +105,18 @@ function passTurn() {
 		return;
 	}
 	if (t.isOwner && allowMovement(t)) {
+		const current = nextToken().document;
+		const hideName = !current.hidden && ![30, 50].includes(current.displayName);
 		getJournal().setFlag(NAME, 'order', turnOrder() + 1);
-		ui.notifications.notify('Turn passed');
+		if (hideName && !game.user.isGM) ui.notifications.notify('Turn passed to someone else...');
+		else ui.notifications.notify(`Turn passed to ${current.name}...`);
 		game.combat?.nextTurn();
-	} else ui.notifications.error('Its not your turn to pass');
+	} else {
+		const current = currentToken().document;
+		const hideName = !current.hidden && ![30, 50].includes(current.displayName);
+		if (hideName) ui.notifications.warn(`It's currently someone else's turn...`);
+		else ui.notifications.warn(`It's currently ${current.name}'s turn...`);
+	}
 }
 
 export function createApi() {
@@ -119,7 +133,20 @@ export function updateMarks() {
 }
 
 export function turnNotifications() {
+	const current = currentToken();
+	if (current.isOwner || !current.document.hidden) canvas.ping(current.center);
 	if (game.user.isGM) return;
-	if (currentToken().isOwner) ui.notifications.notify("It's your turn");
-	else if (nextToken().isOwner) ui.notifications.notify('Your turn is next');
+	if (current.isOwner) ui.notifications.notify("It's your turn!");
+	else if (nextToken().isOwner) ui.notifications.notify('Your turn is next, prepare!');
+}
+
+export function turns() {
+	const restrictedTokens = getAllRestrictedTokens();
+	const order = [];
+	const base = turnOrder();
+	for (let i = 0; i < restrictedTokens.length; i++) {
+		const turn = restrictedTokens[(base + i) % restrictedTokens.length];
+		order.push(turn);
+	}
+	return order;
 }
