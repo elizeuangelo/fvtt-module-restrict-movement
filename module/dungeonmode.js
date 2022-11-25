@@ -1,4 +1,4 @@
-import { NAME, turnOrder, getJournal } from './settings.js';
+import { NAME, turnOrder, getJournal, movementRestricted } from './settings.js';
 import { removeMarks, applyMarks } from './turnmarks.js';
 
 export function getSceneControlButtons(controls) {
@@ -8,13 +8,12 @@ export function getSceneControlButtons(controls) {
 			name: 'dungeon-mode',
 			title: 'Dungeon Mode',
 			icon: 'fas fa-dungeon',
-			active: game.settings.get(NAME, 'movement-restricted'),
+			active: movementRestricted(),
 			toggle: true,
 			onClick: (active) => {
-				game.settings.set(NAME, 'movement-restricted', active);
+				game.settings.set(NAME, 'counter', game.settings.get(NAME, 'counter') + 1);
 				if (active) {
 					ui.notifications.notify('Dungeon mode is now ACTIVE: player movement is restricted');
-					game.settings.set(NAME, 'counter', game.settings.get(NAME, 'counter') + 1);
 				} else ui.notifications.notify('Dungeon Mode is now INACTIVE: players can move freely');
 			},
 		});
@@ -71,7 +70,7 @@ function checkTokenOrder(order = 0, restrictedTokens = getAllRestrictedTokens())
 }
 
 function allowMovement(token) {
-	if (!game.settings.get(NAME, 'movement-restricted') || game.user.isGM) return true;
+	if (!movementRestricted() || game.user.isGM) return true;
 	const restrictedTokens = getAllRestrictedTokens();
 	if (game.combat) return game.combat.current.tokenId === token.id;
 	return currentToken(restrictedTokens).id === token.id;
@@ -100,7 +99,7 @@ export function preUpdateToken(document, update) {
 
 function passTurn() {
 	const t = currentToken();
-	if (!game.settings.get(NAME, 'movement-restricted')) {
+	if (!movementRestricted()) {
 		ui.notifications.notify('Movement is not restricted');
 		return;
 	}
@@ -124,7 +123,7 @@ export function createApi() {
 }
 
 export function updateMarks() {
-	if (game.settings.get(NAME, 'movement-restricted')) {
+	if (movementRestricted()) {
 		const restrictedTokens = getAllRestrictedTokens();
 		const current = currentToken(restrictedTokens);
 		const next = nextToken(restrictedTokens);
@@ -133,7 +132,7 @@ export function updateMarks() {
 }
 
 export function turnNotifications() {
-	if (!game.settings.get(NAME, 'movement-restricted')) return;
+	if (!movementRestricted()) return;
 	const current = currentToken();
 	if (game.settings.get(NAME, 'token-highlight') && (current.isOwner || !current.document.hidden)) canvas.ping(current.center);
 	if (game.user.isGM) return;

@@ -3,13 +3,14 @@ import { updateMarks, turnNotifications, turns } from './dungeonmode.js';
 export const NAME = 'restrict-movement';
 
 export function registerSettings() {
-	game.settings.register(NAME, 'movement-restricted', {
-		name: 'movement restricted',
+	game.settings.register(NAME, 'counter', {
+		name: 'dungeon modes counter',
 		scope: 'world',
 		config: false,
-		type: Boolean,
-		default: false,
-		onChange: (active) => {
+		type: Number,
+		default: 0,
+		onChange: () => {
+			const active = movementRestricted();
 			updateMarks();
 			turnNotifications();
 			if (active && game.user.isGM) {
@@ -24,13 +25,6 @@ export function registerSettings() {
 				});
 			}
 		},
-	});
-	game.settings.register(NAME, 'counter', {
-		name: 'dungeon modes counter',
-		scope: 'world',
-		config: false,
-		type: Number,
-		default: 0,
 	});
 	game.settings.register(NAME, 'pass-turn-btn', {
 		name: 'Show Pass Turn Button',
@@ -63,7 +57,9 @@ export function removeJournal(dir, html) {
 }
 
 export function createJournal() {
-	if (getJournal()) return;
+	const journal = getJournal();
+	if (game.user.isGM && journal.ownership.default !== 3) journal.update({ 'ownership.default': 3 });
+	if (journal) return;
 	JournalEntry.create({
 		name: JOURNAL_NAME,
 		'ownership.default': 3,
@@ -73,4 +69,8 @@ export function createJournal() {
 
 export function turnOrder() {
 	return getJournal().getFlag(NAME, 'order');
+}
+
+export function movementRestricted() {
+	return Boolean(game.settings.get(NAME, 'counter') % 2);
 }
