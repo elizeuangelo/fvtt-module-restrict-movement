@@ -56,3 +56,9 @@ export function applyMarks(token1, token2) {
 export function removeMarks() {
 	for (const mark of Object.values(marks)) removeMark(mark);
 }
+
+Hooks.once('ready', () =>
+	setTimeout(() => {
+		for (const mark of Object.values(marks)) mark.updateText();
+	}, 5000)
+);
