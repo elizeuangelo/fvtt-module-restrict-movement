@@ -1,8 +1,8 @@
 {
 	"id": "restrict-movement",
 	"title": "Faendal's Restrict Movement",
-	"description": "Enable/disable movement based on turns, even outside combat.",
-	"version": "0.94",
+	"description": "Introducing Dungeon Mode! A turn by turn way of exploring, looting and moving through dungeons. Inspired by a high-speed ranger named Faendal…",
+	"version": "1.0",
 	"authors": [
 		{
 			"name": "Elizeu Angelo",

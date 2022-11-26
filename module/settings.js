@@ -15,14 +15,15 @@ export function registerSettings() {
 			turnNotifications();
 			if (active && game.user.isGM) {
 				const order = turns();
-				ChatMessage.create({
+				const msg = {
 					content: `  <div class="card-draw flexrow">
                                     <img class="card-face" src="icons/magic/time/hourglass-tilted-gray.webp" alt="img-name"/>
                                     <h4 class="card-name">Dungeon Mode: Turn Order</h4>
                                 </div>
                                 <ol>${order.map((t) => `<li>${t.name}</li>`).join('')}</ol>`,
-					whisper: [game.user.id],
-				});
+				};
+				if (!game.settings.get(NAME, 'public-turn-messages')) msg.whisper = [game.user.id];
+				ChatMessage.create(msg);
 			}
 		},
 	});
@@ -42,6 +43,14 @@ export function registerSettings() {
 		type: Boolean,
 		default: true,
 		hint: 'Enables/disables token highlight when a turn starts.',
+	});
+	game.settings.register(NAME, 'public-turn-messages', {
+		name: 'Public Turn Messages',
+		scope: 'world',
+		config: true,
+		type: Boolean,
+		default: false,
+		hint: 'Enables/disables whether turn messages should be displayed to all, disable for GM only.',
 	});
 }
 
