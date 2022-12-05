@@ -35,12 +35,15 @@ function applyMark(token, mark) {
 			}
 		}
 	}
-	mark.visible = true;
-	mark.setParent(token);
-
-	const width = token.document.width * canvas.scene.dimensions.size;
-	mark.x = width / 2;
-	mark.y = -10;
+	if (token.object && !token.hidden) {
+		mark.visible = true;
+		mark.setParent(token.object);
+		const width = token.width * canvas.scene.dimensions.size;
+		mark.x = width / 2;
+		mark.y = -10;
+		return;
+	}
+	removeMark(mark);
 }
 
 function removeMark(mark) {

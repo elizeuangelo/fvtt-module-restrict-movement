@@ -3,12 +3,16 @@ import { getSceneControlButtons, preUpdateToken, createApi, updateMarks, turnNot
 
 Hooks.on('getSceneControlButtons', getSceneControlButtons);
 Hooks.on('preUpdateToken', preUpdateToken);
+Hooks.on('updateToken', (token, data) => {
+	if ('hidden' in data) updateMarks();
+});
 Hooks.on('renderJournalDirectory', removeJournal);
 Hooks.on('updateCombat', () => {
 	updateMarks();
 	turnNotifications();
 });
 Hooks.on('deleteCombat', updateMarks);
+Hooks.on('renderSceneNavigation', updateMarks);
 Hooks.once('setup', registerSettings);
 Hooks.once('ready', () => {
 	createJournal();

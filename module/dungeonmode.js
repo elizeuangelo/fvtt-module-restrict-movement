@@ -49,7 +49,13 @@ function shuffleArray(array) {
 }
 
 function getAllRestrictedTokens() {
-	return shuffleArray(canvas.tokens.placeables.filter((t) => t.document.hasPlayerOwner).sort((a, b) => 1 - 2 * (a.id > b.id)));
+	const scenes = new Set([game.scenes.find((s) => s.active), ...game.users.filter((user) => !user.isGM).map((p) => game.scenes.get(p.viewedScene))]);
+	scenes.delete(undefined);
+	const tokens = [];
+	for (const scene of scenes) {
+		tokens.push(...scene.tokens.filter((t) => t.hasPlayerOwner && !t.hidden));
+	}
+	return shuffleArray(tokens.sort((a, b) => 1 - 2 * (a.id > b.id)));
 }
 
 function currentToken(restrictedTokens = getAllRestrictedTokens()) {
@@ -66,7 +72,7 @@ function checkTokenOrder(order = 0, restrictedTokens = getAllRestrictedTokens())
 		return restrictedTokens[turn];
 	}
 	const turn = (game.combat.turn + order) % game.combat.turns.length;
-	return game.combat.turns[turn].token.object;
+	return game.combat.turns[turn].token;
 }
 
 function allowMovement(token) {
@@ -89,7 +95,7 @@ export function preUpdateToken(document, update) {
 		if (!allowMovement(document)) {
 			delete update.x;
 			delete update.y;
-			const current = currentToken().document;
+			const current = currentToken();
 			const hideName = !current.hidden && ![30, 50].includes(current.displayName);
 			if (hideName) ui.notifications.warn(`It is currently someone else's turn...`);
 			else ui.notifications.warn(`It is currently ${current.name}'s turn...`);
@@ -104,14 +110,14 @@ function passTurn() {
 		return;
 	}
 	if (t.isOwner && allowMovement(t)) {
-		const current = nextToken().document;
+		const current = nextToken();
 		const hideName = !current.hidden && ![30, 50].includes(current.displayName);
 		getJournal().setFlag(NAME, 'order', turnOrder() + 1);
 		if (hideName && !game.user.isGM) ui.notifications.notify('Turn passed to someone else...');
 		else ui.notifications.notify(`Turn passed to ${current.name}...`);
 		game.combat?.nextTurn();
 	} else {
-		const current = currentToken().document;
+		const current = currentToken();
 		const hideName = !current.hidden && ![30, 50].includes(current.displayName);
 		if (hideName) ui.notifications.warn(`It's currently someone else's turn...`);
 		else ui.notifications.warn(`It's currently ${current.name}'s turn...`);
@@ -123,18 +129,20 @@ export function createApi() {
 }
 
 export function updateMarks() {
-	if (movementRestricted()) {
-		const restrictedTokens = getAllRestrictedTokens();
-		const current = currentToken(restrictedTokens);
-		const next = nextToken(restrictedTokens);
-		applyMarks(current, next);
-	} else removeMarks();
+	setTimeout(() => {
+		if (movementRestricted()) {
+			const restrictedTokens = getAllRestrictedTokens();
+			const current = currentToken(restrictedTokens);
+			const next = nextToken(restrictedTokens);
+			applyMarks(current, next);
+		} else removeMarks();
+	}, 100);
 }
 
 export function turnNotifications() {
 	if (!movementRestricted()) return;
 	const current = currentToken();
-	if (game.settings.get(NAME, 'token-highlight') && (current.isOwner || !current.document.hidden)) canvas.ping(current.center);
+	if (game.settings.get(NAME, 'token-highlight') && (current.isOwner || !current.hidden) && current.object) canvas.ping(current.object.center);
 	if (game.user.isGM) return;
 	if (current.isOwner) ui.notifications.notify("It's your turn!");
 	else if (nextToken().isOwner) ui.notifications.notify('Your turn is next!');
