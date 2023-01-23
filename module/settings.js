@@ -61,14 +61,17 @@ export function getJournal() {
 }
 
 export function removeJournal(dir, html) {
-	const JOURNAL_ID = getJournal().id;
-	html[0].querySelector(`li[data-document-id="${JOURNAL_ID}"]`)?.remove();
+	const JOURNAL_ID = getJournal()?.id;
+	if (!JOURNAL_ID) return;
+	html[0].querySelector(`li[data-document-id="${JOURNAL_ID}"]`).remove();
 }
 
 export function createJournal() {
 	const journal = getJournal();
-	if (game.user.isGM && journal.ownership.default !== 3) journal.update({ 'ownership.default': 3 });
-	if (journal) return;
+	if (journal) {
+		if (game.user.isGM && journal.ownership.default !== 3) journal.update({ 'ownership.default': 3 });
+		return;
+	}
 	JournalEntry.create({
 		name: JOURNAL_NAME,
 		'ownership.default': 3,
